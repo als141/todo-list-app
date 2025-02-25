@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus, Search, Filter, Calendar, Tag, Check, LayoutGrid, SlidersHorizontal } from 'lucide-react';
+import { Plus, Search, Filter, Calendar, Tag, Check, SlidersHorizontal } from 'lucide-react';
 import { TodoCard } from '@/components/TodoCard';
 import { TodoForm } from '@/components/TodoForm';
 import { Header } from '@/components/Header';
@@ -16,7 +16,6 @@ import {
   DialogHeader, 
   DialogTitle,
   DialogDescription,
-  DialogTrigger
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
@@ -33,7 +32,7 @@ import {
 } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
