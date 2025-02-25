@@ -3,13 +3,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Lock, Mail, User } from "lucide-react";
@@ -29,8 +28,7 @@ type RegisterFormData = {
 
 export default function LoginPage() {
   const router = useRouter();
-  const { toast } = useToast();
-  const { login, register: registerUser, isLoading, error } = useAuthStore();
+  const { login, register: registerUser, isLoading, error: authError } = useAuthStore();
   const [activeTab, setActiveTab] = useState("login");
 
   // ログインフォーム
@@ -52,13 +50,11 @@ export default function LoginPage() {
   const onLogin = async (data: LoginFormData) => {
     try {
       await login(data.email, data.password);
-      toast({
-        title: "ログインしました",
+      toast("ログインしました", {
         description: "TODOリストへようこそ！",
-        variant: "default",
       });
       router.push("/");
-    } catch (error: any) {
+    } catch {
       // エラーは既にstoreでセットされる
     }
   };
@@ -67,13 +63,11 @@ export default function LoginPage() {
   const onRegister = async (data: RegisterFormData) => {
     try {
       await registerUser(data.username, data.email, data.password);
-      toast({
-        title: "登録完了",
+      toast("登録完了", {
         description: "アカウントが正常に作成されました。",
-        variant: "default",
       });
       router.push("/");
-    } catch (error: any) {
+    } catch {
       // エラーは既にstoreでセットされる
     }
   };
@@ -101,9 +95,9 @@ export default function LoginPage() {
                 <TabsTrigger value="register">新規登録</TabsTrigger>
               </TabsList>
               
-              {error && (
+              {authError && (
                 <div className="bg-destructive/10 text-destructive rounded-md p-3 mb-4 text-sm">
-                  {error}
+                  {authError}
                 </div>
               )}
               

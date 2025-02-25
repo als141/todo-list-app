@@ -1,8 +1,8 @@
 // frontend/src/app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,17 +32,7 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
-          <Toaster
-            position="top-right"
-            expand={false}
-            richColors
-            closeButton
-            theme="system"
-            toastOptions={{
-              duration: 5000,
-              className: "font-sans",
-            }}
-          />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

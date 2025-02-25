@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { 
-  Moon, Sun, Laptop, Plus, Trash, ChevronLeft,
+  Moon, Sun, Laptop, Plus, ChevronLeft,
   LogOut, Settings, User, Palette
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ import { CategoryForm } from "@/components/CategoryForm";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -32,13 +31,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useAuthStore, useTodoStore, useThemeStore } from "@/store";
 import { Category } from "@/types";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { toast } = useToast();
   const { user, logout } = useAuthStore();
   const { categories, fetchCategories, addCategory, updateCategory, deleteCategory } = useTodoStore();
   const { theme, setTheme } = useThemeStore();
@@ -65,9 +63,7 @@ export default function SettingsPage() {
   const handleLogout = () => {
     logout();
     router.push("/login");
-    toast({
-      title: "ログアウトしました",
-    });
+    toast("ログアウトしました");
   };
 
   // カテゴリ追加
@@ -75,14 +71,12 @@ export default function SettingsPage() {
     try {
       await addCategory(data);
       setShowAddDialog(false);
-      toast({
-        title: "カテゴリを追加しました",
+      toast("カテゴリを追加しました", {
         description: data.name,
       });
-    } catch (error) {
-      toast({
-        title: "カテゴリの追加に失敗しました",
-        variant: "destructive",
+    } catch {
+      toast("カテゴリの追加に失敗しました", {
+        className: "bg-destructive text-destructive-foreground",
       });
     }
   };
@@ -95,14 +89,12 @@ export default function SettingsPage() {
       await updateCategory(editingCategory.id, data);
       setShowEditDialog(false);
       setEditingCategory(null);
-      toast({
-        title: "カテゴリを更新しました",
+      toast("カテゴリを更新しました", {
         description: data.name,
       });
-    } catch (error) {
-      toast({
-        title: "カテゴリの更新に失敗しました",
-        variant: "destructive",
+    } catch {
+      toast("カテゴリの更新に失敗しました", {
+        className: "bg-destructive text-destructive-foreground",
       });
     }
   };
@@ -111,13 +103,10 @@ export default function SettingsPage() {
   const handleDeleteCategory = async (id: number) => {
     try {
       await deleteCategory(id);
-      toast({
-        title: "カテゴリを削除しました",
-      });
-    } catch (error) {
-      toast({
-        title: "カテゴリの削除に失敗しました",
-        variant: "destructive",
+      toast("カテゴリを削除しました");
+    } catch {
+      toast("カテゴリの削除に失敗しました", {
+        className: "bg-destructive text-destructive-foreground",
       });
     }
   };

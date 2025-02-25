@@ -2,9 +2,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus, Search, Filter, Calendar, Tag, Check, SlidersHorizontal } from 'lucide-react';
+import { Plus, Search, Filter, Calendar, Check, SlidersHorizontal } from 'lucide-react';
 import { TodoCard } from '@/components/TodoCard';
 import { TodoForm } from '@/components/TodoForm';
 import { Header } from '@/components/Header';
@@ -35,26 +34,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useAuthStore, useTodoStore } from '@/store';
-import { Todo, Filter as FilterType, Priority } from '@/types';
+import { Todo, Priority } from '@/types';
 import { format } from 'date-fns';
 
 export default function Home() {
-  const router = useRouter();
-  const { toast } = useToast();
   const { user, fetchCurrentUser } = useAuthStore();
   const { 
     todos, 
     categories, 
     filters,
-    isLoading,
     fetchTodos, 
     fetchCategories, 
     addTodo, 
     updateTodo, 
-    deleteTodo, 
-    reorderTodos,
+    deleteTodo,
     setFilters,
     clearFilters
   } = useTodoStore();
@@ -71,8 +66,8 @@ export default function Home() {
     const checkAuth = async () => {
       try {
         await fetchCurrentUser();
-      } catch (error) {
-        console.log("認証エラー、ログインページにリダイレクトします", error);
+      } catch {
+        console.log("認証エラー、ログインページにリダイレクトします");
         window.location.href = '/login';
       }
     };
@@ -97,50 +92,46 @@ export default function Home() {
   }, [todos]);
   
   // タスクの追加
-  const handleAddTodo = async (data: any) => {
+  const handleAddTodo = async (data: Record<string, unknown>) => {
     try {
       await addTodo({
-        task: data.task,
-        description: data.description,
-        priority: data.priority,
-        due_date: data.due_date ? format(data.due_date, "yyyy-MM-dd'T'HH:mm:ss") : undefined,
-        category_id: data.category_id
+        task: data.task as string,
+        description: data.description as string | undefined,
+        priority: data.priority as Priority | undefined,
+        due_date: data.due_date ? format(data.due_date as Date, "yyyy-MM-dd'T'HH:mm:ss") : undefined,
+        category_id: data.category_id as number | undefined
       });
       setShowAddDialog(false);
-      toast({
-        title: "タスクを追加しました",
-        description: data.task,
+      toast("タスクを追加しました", {
+        description: data.task as string,
       });
-    } catch (error) {
-      toast({
-        title: "タスクの追加に失敗しました",
-        variant: "destructive",
+    } catch {
+      toast("タスクの追加に失敗しました", {
+        className: "bg-destructive text-destructive-foreground",
       });
     }
   };
 
   // タスクの更新
-  const handleUpdateTodo = async (data: any) => {
+  const handleUpdateTodo = async (data: Record<string, unknown>) => {
     if (!editingTodo) return;
     
     try {
       await updateTodo(editingTodo.id, {
-        task: data.task,
-        description: data.description,
-        priority: data.priority,
-        due_date: data.due_date ? format(data.due_date, "yyyy-MM-dd'T'HH:mm:ss") : null,
-        category_id: data.category_id
+        task: data.task as string | undefined,
+        description: data.description as string | undefined,
+        priority: data.priority as Priority | undefined,
+        due_date: data.due_date ? format(data.due_date as Date, "yyyy-MM-dd'T'HH:mm:ss") : null,
+        category_id: data.category_id as number | null | undefined
       });
       setShowEditDialog(false);
       setEditingTodo(null);
-      toast({
-        title: "タスクを更新しました",
-        description: data.task,
+      toast("タスクを更新しました", {
+        description: data.task as string,
       });
-    } catch (error) {
-      toast({
-        title: "タスクの更新に失敗しました",
-        variant: "destructive",
+    } catch {
+      toast("タスクの更新に失敗しました", {
+        className: "bg-destructive text-destructive-foreground",
       });
     }
   };
@@ -149,13 +140,10 @@ export default function Home() {
   const handleDeleteTodo = async (id: number) => {
     try {
       await deleteTodo(id);
-      toast({
-        title: "タスクを削除しました",
-      });
-    } catch (error) {
-      toast({
-        title: "タスクの削除に失敗しました",
-        variant: "destructive",
+      toast("タスクを削除しました");
+    } catch {
+      toast("タスクの削除に失敗しました", {
+        className: "bg-destructive text-destructive-foreground",
       });
     }
   };
@@ -181,24 +169,23 @@ export default function Home() {
         due_date_to: `${formattedDate}T23:59:59`
       });
     } else {
-      const { due_date_from, due_date_to, ...restFilters } = filters;
-      setFilters(restFilters);
+      const tempFilters = { ...filters };
+      delete tempFilters.due_date_from;
+      delete tempFilters.due_date_to;
+      setFilters(tempFilters);
     }
   };
 
   // タスク更新ハンドラ
-  const handleQuickUpdate = async (id: number, updates: any) => {
+  const handleQuickUpdate = async (id: number, updates: Record<string, unknown>) => {
     try {
-      await updateTodo(id, updates);
+      await updateTodo(id, updates as { completed?: boolean });
       if (updates.completed) {
-        toast({
-          title: "タスクを完了しました",
-        });
+        toast("タスクを完了しました");
       }
-    } catch (error) {
-      toast({
-        title: "タスクの更新に失敗しました",
-        variant: "destructive",
+    } catch {
+      toast("タスクの更新に失敗しました", {
+        className: "bg-destructive text-destructive-foreground",
       });
     }
   };

@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { 
-  User, 
   Settings, 
   LogOut, 
   Moon, 
@@ -23,11 +22,10 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuthStore, useThemeStore } from "@/store";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export const Header: React.FC = () => {
   const router = useRouter();
-  const { toast } = useToast();
   const { user, logout } = useAuthStore();
   const { theme, setTheme } = useThemeStore();
 
@@ -43,9 +41,7 @@ export const Header: React.FC = () => {
   // ログアウト処理
   const handleLogout = () => {
     logout();
-    toast({
-      title: "ログアウトしました",
-    });
+    toast("ログアウトしました");
     router.push("/login");
   };
 

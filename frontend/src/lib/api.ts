@@ -1,5 +1,5 @@
 // frontend/src/lib/api.ts
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { 
   Todo, 
   TodoCreate, 
@@ -93,7 +93,7 @@ export const authApi = {
 export const todoApi = {
   // タスク一覧取得
   getTodos: async (filters?: Filter): Promise<Todo[]> => {
-    const params: Record<string, any> = {};
+    const params: Record<string, unknown> = {};
     
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {

@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { CheckCircle, Clock, AlertCircle, ArrowUp, Edit, Trash } from 'lucide-react';
+import { Clock, AlertCircle, ArrowUp, Edit, Trash } from 'lucide-react';
 import { Todo, Priority } from '@/types';
 import { Badge } from './ui/badge';
 import { Checkbox } from './ui/checkbox';

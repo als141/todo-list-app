@@ -11,7 +11,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
-  fetchCurrentUser: () => Promise<User | void>; // 戻り値の型を修正
+  fetchCurrentUser: () => Promise<User | void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -26,10 +26,11 @@ export const useAuthStore = create<AuthState>()(
           await authApi.login({ email, password });
           const user = await authApi.getCurrentUser();
           set({ user, isLoading: false });
-        } catch (error: any) {
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'ログインに失敗しました。';
           set({
             isLoading: false,
-            error: error.response?.data?.detail || 'ログインに失敗しました。',
+            error: errorMessage,
           });
           throw error;
         }
@@ -41,10 +42,11 @@ export const useAuthStore = create<AuthState>()(
           await authApi.login({ email, password });
           const user = await authApi.getCurrentUser();
           set({ user, isLoading: false });
-        } catch (error: any) {
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : '登録に失敗しました。';
           set({
             isLoading: false,
-            error: error.response?.data?.detail || '登録に失敗しました。',
+            error: errorMessage,
           });
           throw error;
         }
@@ -64,11 +66,12 @@ export const useAuthStore = create<AuthState>()(
           const user = await authApi.getCurrentUser();
           set({ user, isLoading: false });
           return user;
-        } catch (error: any) {
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : "認証エラーが発生しました";
           set({ 
             user: null, 
             isLoading: false,
-            error: error.response?.data?.detail || "認証エラーが発生しました" 
+            error: errorMessage
           });
           throw error;
         }
@@ -108,10 +111,10 @@ export const useTodoStore = create<TodoState>()((set, get) => ({
     try {
       const todos = await todoApi.getTodos(get().filters);
       set({ todos, isLoading: false });
-    } catch (error: any) {
+    } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.detail || 'タスクの取得に失敗しました。',
+        error: error instanceof Error ? error.message : 'タスクの取得に失敗しました。',
       });
     }
   },
@@ -120,10 +123,10 @@ export const useTodoStore = create<TodoState>()((set, get) => ({
     try {
       const categories = await categoryApi.getCategories();
       set({ categories, isLoading: false });
-    } catch (error: any) {
+    } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.detail || 'カテゴリの取得に失敗しました。',
+        error: error instanceof Error ? error.message : 'カテゴリの取得に失敗しました。',
       });
     }
   },
@@ -135,10 +138,10 @@ export const useTodoStore = create<TodoState>()((set, get) => ({
         todos: [...state.todos, newTodo],
         isLoading: false,
       }));
-    } catch (error: any) {
+    } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.detail || 'タスクの追加に失敗しました。',
+        error: error instanceof Error ? error.message : 'タスクの追加に失敗しました。',
       });
     }
   },
@@ -150,10 +153,10 @@ export const useTodoStore = create<TodoState>()((set, get) => ({
         todos: state.todos.map((todo) => (todo.id === id ? updatedTodo : todo)),
         isLoading: false,
       }));
-    } catch (error: any) {
+    } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.detail || 'タスクの更新に失敗しました。',
+        error: error instanceof Error ? error.message : 'タスクの更新に失敗しました。',
       });
     }
   },
@@ -165,10 +168,10 @@ export const useTodoStore = create<TodoState>()((set, get) => ({
         todos: state.todos.filter((todo) => todo.id !== id),
         isLoading: false,
       }));
-    } catch (error: any) {
+    } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.detail || 'タスクの削除に失敗しました。',
+        error: error instanceof Error ? error.message : 'タスクの削除に失敗しました。',
       });
     }
   },
@@ -182,10 +185,10 @@ export const useTodoStore = create<TodoState>()((set, get) => ({
       ).filter((todo): todo is Todo => todo !== undefined);
       
       set({ todos: reorderedTodos, isLoading: false });
-    } catch (error: any) {
+    } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.detail || 'タスクの並び替えに失敗しました。',
+        error: error instanceof Error ? error.message : 'タスクの並び替えに失敗しました。',
       });
     }
   },
@@ -197,10 +200,10 @@ export const useTodoStore = create<TodoState>()((set, get) => ({
         categories: [...state.categories, newCategory],
         isLoading: false,
       }));
-    } catch (error: any) {
+    } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.detail || 'カテゴリの追加に失敗しました。',
+        error: error instanceof Error ? error.message : 'カテゴリの追加に失敗しました。',
       });
     }
   },
@@ -214,10 +217,10 @@ export const useTodoStore = create<TodoState>()((set, get) => ({
         ),
         isLoading: false,
       }));
-    } catch (error: any) {
+    } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.detail || 'カテゴリの更新に失敗しました。',
+        error: error instanceof Error ? error.message : 'カテゴリの更新に失敗しました。',
       });
     }
   },
@@ -231,10 +234,10 @@ export const useTodoStore = create<TodoState>()((set, get) => ({
       }));
       // そのカテゴリを持つタスクを再取得
       await get().fetchTodos();
-    } catch (error: any) {
+    } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.detail || 'カテゴリの削除に失敗しました。',
+        error: error instanceof Error ? error.message : 'カテゴリの削除に失敗しました。',
       });
     }
   },

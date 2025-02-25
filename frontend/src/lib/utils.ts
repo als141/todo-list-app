@@ -38,9 +38,9 @@ export function formatDate(date: Date | string | undefined, includeTime = false)
  * オブジェクトから空の値を除外する
  * @param obj 元のオブジェクト
  */
-export function removeEmptyValues<T extends Record<string, any>>(obj: T): Partial<T> {
+export function removeEmptyValues<T extends Record<string, unknown>>(obj: T): Partial<T> {
   return Object.fromEntries(
-    Object.entries(obj).filter(([_, value]) => {
+    Object.entries(obj).filter(([, value]) => {
       if (value === null || value === undefined || value === "") return false;
       return true;
     })
