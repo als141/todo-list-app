@@ -246,7 +246,7 @@ export default function Home() {
             <div>
               <h1 className="text-3xl font-bold">TODOリスト</h1>
               <p className="text-muted-foreground">
-                こんにちは、{user.username}さん。今日も生産的な一日を。
+                こんにちは、{user.username}さん。
               </p>
             </div>
             <Button onClick={() => setShowAddDialog(true)} size="sm" className="sm:ml-auto">
