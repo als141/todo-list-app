@@ -5,30 +5,82 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime, timedelta
+import os
 
 import models
 import schemas
 import auth
 from database import get_db, engine
 
-# データベース初期化
-models.Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title="モダンTODOアプリAPI")
+
+# フロントエンドのURL
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://todo-list-app-eta-two.vercel.app")
 
 # CORS設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # フロントエンドのURLに変更すべき
+    # すべてのオリジン許可、またはリストでフロントエンドURLを指定
+    allow_origins=["*"],  # または [FRONTEND_URL, "http://localhost:3000"]
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],  # すべてのHTTPメソッドを許可
+    allow_headers=["*"],  # すべてのヘッダーを許可
+    expose_headers=["*"],  # レスポンスヘッダーの公開
+    max_age=600,  # プリフライトリクエストのキャッシュ時間（秒）
 )
+
+# App Engine環境かどうかを確認
+is_appengine = os.getenv('GAE_APPLICATION', None) is not None
+
+# データベース初期化
+models.Base.metadata.create_all(bind=engine)
+
+# App Engine環境でインメモリDBを使用する場合のみ初期データを投入
+if is_appengine and os.getenv("DATABASE_URL", "").startswith("sqlite:///:memory:"):
+    # セッションの作成
+    from database import SessionLocal
+    db = SessionLocal()
+    try:
+        # ダミーユーザーの作成（デモ用）
+        test_user_email = "test@example.com"
+        existing_user = db.query(models.User).filter(models.User.email == test_user_email).first()
+        if not existing_user:
+            hashed_password = auth.get_password_hash("password123")
+            test_user = models.User(
+                email=test_user_email,
+                username="testuser",
+                hashed_password=hashed_password
+            )
+            db.add(test_user)
+            db.commit()
+            db.refresh(test_user)
+            
+            # デフォルトカテゴリの作成
+            categories = [
+                {"name": "仕事", "color": "#EF4444"},     # 赤
+                {"name": "個人", "color": "#3B82F6"},     # 青
+                {"name": "買い物", "color": "#10B981"},   # 緑
+                {"name": "勉強", "color": "#F59E0B"},     # オレンジ
+            ]
+            
+            for cat in categories:
+                db_category = models.Category(
+                    name=cat["name"],
+                    color=cat["color"],
+                    user_id=test_user.id
+                )
+                db.add(db_category)
+            
+            db.commit()
+    except Exception as e:
+        print(f"初期データ作成エラー: {e}")
+    finally:
+        db.close()
 
 # ルートエンドポイント
 @app.get("/")
 def read_root():
-    return {"message": "モダンTODOアプリAPI"}
+    return {"message": "モダンTODOアプリAPI", "status": "running"}
 
 # ユーザー登録
 @app.post("/users/", response_model=schemas.User)

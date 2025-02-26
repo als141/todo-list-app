@@ -21,7 +21,7 @@ class User(UserBase):
     is_active: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # 'orm_mode' から 'from_attributes' に変更
 
 # Category関連スキーマ
 class CategoryBase(BaseModel):
@@ -36,7 +36,7 @@ class Category(CategoryBase):
     user_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # 'orm_mode' から 'from_attributes' に変更
 
 # Todo関連スキーマ
 class TodoBase(BaseModel):
@@ -69,7 +69,7 @@ class Todo(TodoBase):
     category: Optional[Category] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # 'orm_mode' から 'from_attributes' に変更
 
 # Token関連スキーマ
 class Token(BaseModel):
