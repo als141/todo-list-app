@@ -6,6 +6,11 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime, timedelta
 import os
+import logging
+
+# ロギングの設定
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 import models
 import schemas
@@ -20,14 +25,16 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "https://todo-list-app-eta-two.vercel.a
 # CORS設定
 app.add_middleware(
     CORSMiddleware,
-    # すべてのオリジン許可、またはリストでフロントエンドURLを指定
-    allow_origins=["*"],  # または [FRONTEND_URL, "http://localhost:3000"]
+    # 明示的にフロントエンドURLを指定
+    allow_origins=[FRONTEND_URL, "http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],  # すべてのHTTPメソッドを許可
-    allow_headers=["*"],  # すべてのヘッダーを許可
-    expose_headers=["*"],  # レスポンスヘッダーの公開
-    max_age=600,  # プリフライトリクエストのキャッシュ時間（秒）
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=600,
 )
+
+logger.info(f"CORS設定: allow_origins={[FRONTEND_URL, 'http://localhost:3000']}")
 
 # App Engine環境かどうかを確認
 is_appengine = os.getenv('GAE_APPLICATION', None) is not None
